@@ -118,39 +118,55 @@ var baseMaps = {
     //Link to perform a call to the github repo to get tectonic plate boundaries
     var plates_url = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_plates.json";
 
-    //access data and create layer
-    d3.json(plates_url, function(response) {
-      //create geoJSON layer and add to map
-      var geoPlates = L.geoJSON(response, {
+    
+      //create a layergroup for the plates
+    var tectonic_plates =new L.LayerGroup();
+    
+    //access data and add the the polygons to the layergroup
+    d3.json(plates_url, function(geoJson){
+      L.geoJson(geoJson.features, {
         style: {
-            color: "orange",
-            weight: 2,
-            opacity: .005
+          
+        color: "orange",
+        weight: 2.0,
+        fillopacity: 0,
+        fill:false
+        
+          
         }
-      });
-      console.log(geoPlates)
-      var earthquake=L.layerGroup(locations)
-      var tectonic_plates=L.layerGroup(geoPlates)
-      var overlaymaps={
+      }).addTo(tectonic_plates);
+    });
+     
+    
+    var earthquake=L.layerGroup(locations)
+      // var tectonic_plates=L.layerGroup(geoPlates)
+    
+      // create an overlaymaps variable and it as a control layer
+    var overlaymaps={
         "Earthquake":earthquake,
         "Tectonic Plates": tectonic_plates
       }
-    
+      L.control.layers(baseMaps,overlaymaps,{
+        collapsed:false
+        }).addTo(myMap);
+
+      
+    // })
       // Create a new marker cluster group
       var markers = L.markerClusterGroup();
      // Loop through the quakecoord array and create one marker for each earthquake co-ord object and bind labels tot the markers
       for (var l=0;l<quakecoord.length;l++){
         
-        markers.addLayer(L.marker(quakecoord[l]).bindPopup("<h1>" + places[l] + "</h1>"));
+        markers.addLayer(L.marker(quakecoord[l]).bindPopup("<h1>" + "Places:" +places[l] + "</h1>"));
       }  
     
-    // Pass our map layers into our layer control
-    // Add the layer control to the map
-    L.control.layers(baseMaps,overlaymaps,{
-      collapsed:false
-    }).addTo(myMap);
-    myMap.addLayer(markers)
-    })
+      // Pass our map layers into our layer control
+      // Add the layer control to the map
+      // L.control.layers(baseMaps,overlaymaps,{
+      // collapsed:false
+      // }).addTo(myMap);
+      myMap.addLayer(markers)
+    // })
   })
 
   function getColor(d) {
