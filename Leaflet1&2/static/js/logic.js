@@ -64,14 +64,18 @@ var baseMaps = {
     var depth =[]
     var locations=[]
     var places=[]
-    
+    var date=[]
+    var time=[]
     
 
     for (var i=0;i<data.features.length;i++){
         
         quakegeometry.push(data.features[i].geometry.coordinates)
         mag.push(data.features[i].properties.mag)  
-        places.push(data.features[i].properties.place)          
+        places.push(data.features[i].properties.place)
+        date.push(new Date(data.features[i].properties.time).toLocaleDateString("en-US")) 
+        time.push(new Date(data.features[i].properties.time).toLocaleTimeString("en-US")) 
+          
     }
 
     for (var j=0;j<quakegeometry.length;j++){
@@ -83,7 +87,7 @@ var baseMaps = {
         var color = "";
     
         if (depth[m] > 90) {
-            color = "'#800026'";
+            color = "#800026";
         }
         else if (depth[m] > 70 && depth[m]<90 ) {
             color = "#BD0026";
@@ -157,7 +161,7 @@ var baseMaps = {
      // Loop through the quakecoord array and create one marker for each earthquake co-ord object and bind labels tot the markers
       for (var l=0;l<quakecoord.length;l++){
         
-        markers.addLayer(L.marker(quakecoord[l]).bindPopup("<h1>" + "Places:" +places[l] + "</h1>"));
+        markers.addLayer(L.marker(quakecoord[l]).bindPopup("<h1>" + "Places:" +places[l] +"\n" + "Date:" + date[l] + "\n" +"Time:" + time[l] + "\n"  +"magnitude:" +mag[l] + "</h1>"));
       }  
     
       // Pass our map layers into our layer control
@@ -170,14 +174,14 @@ var baseMaps = {
   })
 
   function getColor(d) {
-  return d === '90' ? '#800026' :
+  return d === '90-150' ? '#800026' :
          d === '70-90'  ? '#BD0026' :
          d === '50-70'  ? '#E31A1C' :
          d === '30-50' ? '#FC4E2A' :
       //    d > 10  ? '#FD8D3C' :
          d === '10-30'   ? '#FEB24C' :
-      //    d > 10   ? '#FED976' :
-                    '#FFEDA0';
+         d === '0-10'   ? '#FED976' :
+                 '#FFEDA0';
   }
 
 
@@ -207,7 +211,7 @@ var legend = L.control({position: 'bottomright'});
 legend.onAdd = function (map) {
 var div = L.DomUtil.create('div', 'info legend');
 labels = ['<strong>Depths</strong>'],
-categories = ['90','70-90','50-70','30-50','10-30','0-10'];
+categories = ['90-150','70-90','50-70','30-50','10-30','0-10'];
 for (var i = 0; i < categories.length; i++) {
     div.innerHTML += 
     labels.push(
